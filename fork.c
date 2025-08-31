@@ -97,7 +97,7 @@ int main(){
 
                 for (i; i<n; i++) {
 
-                    printf("soy el proceso hijo %d\n", i+1);
+                    printf("soy el procesfsdo hijo %d\n", i+1);
                     f  = fork();
                     waitpid(f, &status, 0); //aseguramos que finalize el hijo, para imprimir en orden
                 }
