@@ -1,3 +1,4 @@
+//LUIS ADRIAN HERRAN SILVA 743981
 //     1.-Escribir un programa que cree un hijo. El hijo debe escribir: "Soy el hijo" diez veces.
 //     El padre debe escribir: "Soy el padre" diez veces. Ambos procesos deberán mostrar 
 //     concurrentemente sus líneas en pantalla y entre cada linea que escriban deben hacer
@@ -17,10 +18,16 @@
 //     Si n=4 terminarán 16 procesos que deberán mostrar en pantalla 
 //     0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 
+// 3.- Desarrolla un programa que reciba como argumento desde la línea de comandos un valor de 
+// entrada n cuyo significado sera un número de procesos a crear, de manera que cuando ejecutes 
+// tu programa este será el proceso padre que creará solamente n procesos hijos a un nivel, cada
+//  proceso hijo mostrará su número que será de 1 hasta n. El proceso padre deberá esperar a que
+//    todos los hijos terminen para al finalizar mostrar en pantalla el mensaje "Fin"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 void child(int n){
 
@@ -31,11 +38,12 @@ void child(int n){
 
 int main(){
 
-    int choice;
+    int choice = 0;
 
-    do {
+    while(choice != 6) {
+
         choice = 0;
-        int i = 0, f = 0,p = 0;
+        int i = 0, f = 0,p = 0, n = 0, status;
 
         printf(
             "Bienvenido a Actividad 3, ingrese la tarea a correr\n"
@@ -52,7 +60,8 @@ int main(){
         switch(choice)
         {
             case 1: {
-                for(i=0;i<11;i++){
+
+                for(i; i<11; i++){
                     f = fork();
                     
                     if (f==0) child(i);
@@ -67,12 +76,10 @@ int main(){
 
             case 2: {
 
-                int n;
-
                 printf("Ingresa la cantidad de niveles: ");
                 scanf("%d",&n);
 
-                for(i=0; i<=n; i++) {
+                for(i; i<=n; i++) {
                    
                     printf("%d\n",i);
                     f = fork();
@@ -84,17 +91,33 @@ int main(){
 
             case 3: {
 
+                printf("Ingresa la cantidad de procesos: ");
+                scanf("%d",&n);
+
+                for (i; i<n; i++) {
+
+                    printf("soy el proceso hijo %d\n", i+1);
+                    f  = fork();
+                    waitpid(f, &status, 0); //aseguramos que finalize el hijo, para imprimir en orden
+                }
+
+                printf("Fin\n");
+                break;
+            }
+
+            case 4 : {
+
             }
 
             case 6:
                 printf("byeee\n");
-                break;
+                return 0;
 
             default:
             printf("Opcion incorrecta\n"); break;
         }
 
         
-    }while(choice != 6);
+    }
 
 }
