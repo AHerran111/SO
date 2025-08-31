@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <string.h>
 
 void child(int n){
 
@@ -106,6 +107,49 @@ int main(){
             }
 
             case 4 : {
+
+                char file[20];
+                char command[25];
+
+                printf("Imprimiendo lista de archivos:\n");
+                system("ls -l");
+
+                printf("\nEscoge el archivo .o a correr: ");
+                scanf("%s", file);
+
+                sprintf(command, "./%s", file);
+                system(command);
+                break;
+
+            }
+
+            case 5: {
+
+                char file[20];
+                char exec[] = "./" ;
+
+                
+                printf("Imprimiendo lista de archivos:\n");
+                f = fork();
+
+                if (f == 0) {
+                    execlp("ls","ls","-l",NULL);
+                }
+                waitpid(f, &status, 0);
+
+                printf("\nEscoge el archivo .o a correr: ");
+                scanf("%s", file);
+
+                printf("\nEjecutando programa %s...\n", file);
+                sleep(1);
+
+                f = fork();
+
+                if (f == 0) {
+                    execlp(strcat(exec,file),file,NULL);
+                }
+                waitpid(f, &status, 0);
+                break;
 
             }
 
