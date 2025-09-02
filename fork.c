@@ -124,31 +124,71 @@ int main(){
             }
 
             case 5: {
-
-                char file[20];
-                char exec[] = "./" ;
-
                 
-                printf("Imprimiendo lista de archivos:\n");
-                f = fork();
+                char input[100];
+                char *command[20];    
+                char* token;
+                int flag = 1;
 
-                if (f == 0) {
-                    execlp("ls","ls","-l",NULL);
+                while(strcmp("exit",input)) {
+                    i = 0;
+
+                    printf("ingresa comando\n");
+                    if (flag) getchar();//first run has \n in buffer, not
+                                        // needed for the runs after
+                    
+                    fgets(input,sizeof(input),stdin);
+                    input[strcspn(input, "\n")] = '\0';//removes trailing "enter"
+
+                    token = strtok(input, " ");
+                    
+                    while(token != 0) {
+
+                        command[i] = token;
+                        token = strtok(NULL, " ");
+                        //It keeps track of where it left off using internal static memory, 
+                        // so you keep calling it with NULL until no tokens remain. 
+
+                        i += 1;
+                    }
+                    command[i] = NULL;//execvp() recieves the last NULL in the array
+
+                    f = fork();
+
+                    if (f == 0) {
+                        execvp(command[0],command);
+                        exit(0);
+                    }
+
+                    waitpid(f,&status,0);
+
+                    memset(command, 0, sizeof(command));
+                    memset(input, 0, sizeof(input));
+                    flag = 0;
+                    
                 }
-                waitpid(f, &status, 0);
 
-                printf("\nEscoge el archivo .o a correr: ");
-                scanf("%s", file);
+                // printf("Imprimiendo lista de archivos:\n");
+                // f = fork();
 
-                printf("\nEjecutando programa %s...\n", file);
-                sleep(1);
+                // if (f == 0) {
+                //     execlp("ls","ls","-l",NULL);
+                // }
+                // waitpid(f, &status, 0);
 
-                f = fork();
+                // printf("\nEscoge el archivo .o a correr: ");
+                // scanf("%s", file);
 
-                if (f == 0) {
-                    execlp(strcat(exec,file),file,NULL);
-                }
-                waitpid(f, &status, 0);
+                // printf("\nEjecutando programa %s...\n", file);
+                // sleep(1);
+
+                // f = fork();
+
+                // if (f == 0) {
+                //     execlp(strcat(exec,file),file,NULL);
+                // }
+                // waitpid(f, &status, 0);
+                // break;
                 break;
 
             }
