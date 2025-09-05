@@ -16,19 +16,21 @@ void sigchild_handler (int sig) {
     //by catching the signal the kernel cleans up, the child is already exited
     while (pid = waitpid(-1,&status,WNOHANG) > 0) {
                                               
-        printf("zombie aniquilado con pid:%d\n", pid);
+        printf(BLUE("zombie aniquilado con pid:%d\n"), pid);
     }
 }
 
 int main() {
     int i = 0, f, status;
-    char input[100];
-    char *command[20];  
-    char *p_command[20];  
-    char *token;
-    int p_flag = 0;
-    int des_p[2];
-    int in_flag = 0, out_flag = 0;
+    char input[100]; //scanf input
+    char *command[20];   //parsed command
+    char *token; 
+
+    char *p_command[20];  //pipe vars
+    int p_flag = 0; 
+    int des_p[2]; 
+
+    int in_flag = 0, out_flag = 0; //variables for redirect
     char *in_file = malloc(64); 
     char *out_file = malloc(64); 
     int saved_stdin;
@@ -46,32 +48,34 @@ int main() {
         fgets(input,sizeof(input),stdin);
         input[strcspn(input, "\n")] = '\0';//removes trailing "enter"
 
+        //stdin and stdout are restorded in case of redirect
         saved_stdin = dup(STDIN_FILENO);
         saved_stdout = dup(STDOUT_FILENO);
 
+        //parsing command
         token = strtok(input, " ");
 
         while(token) {
 
             if (strcspn(token,"|") == 0) {
-              printf("pipe detected\n");
+              printf(BLUE("pipe detected\n"));
               p_flag = 1;
               break;
             }
 
             if (strcspn(token,"<") == 0) {
 
-                printf("sdtin redirect detected\n");
+                printf(BLUE("sdtin redirect detected\n"));
                 in_flag = 1;
-                command[i] = NULL;//execvp() recieves the last NULL in the array
+                command[i] = NULL;
                 break;
             }
 
             if (strcspn(token,">") == 0) {
 
-                printf("sdtout redirect detected\n");
+                printf(BLUE("sdtout redirect detected\n"));
                 out_flag = 1;
-                command[i] = NULL;//execvp() recieves the last NULL in the array
+                command[i] = NULL;
                 break;
             }
 
@@ -84,6 +88,7 @@ int main() {
         }
         command[i] = NULL;//execvp() recieves the last NULL in the array
 
+        //parsing 2nd command after pipe
         if (p_flag) {
             i = 0;
 
@@ -94,9 +99,10 @@ int main() {
                 
                 i += 1;
             }
-            p_command[i] = NULL;//execvp() recieves the last NULL in the array
+            p_command[i] = NULL;
         }
 
+        //parsing file names after redirect
         if (in_flag || out_flag) {
 
             token = strtok(NULL, " ");
@@ -110,47 +116,54 @@ int main() {
 
             f = fork();
 
-            if (f < 0)  perror("fork fallido");
+            if (f < 0)  perror(RED("fork fallido"));
             
             else {
 
+                //background process
                 if(strcspn(command[i-1],"&") == 0) {
 
-                    if (f) printf("Proceso en background(PID: %d)\n", f);
+                    if (f) printf(BLUE("Proceso en background(PID: %d)\n"), f);
                 
                     else {
 
-                        setsid(); //creating deamon for background proccess
+                        //creating deamon for background proccess
+                        setsid(); 
                         close(STDIN_FILENO);
                         close(STDOUT_FILENO);
                         close(STDERR_FILENO);
 
                         execvp(command[0],command);
-                        perror("Falla en ejecucion excecvp()");
+                        perror(RED("Falla en ejecucion background excecvp()"));
                         exit(0);
                     }
                     sleep(1);
                 }
                 
                 else {
+
+                    //redirects
+                    //taken from
+                    //https://stackoverflow.com/questions/11515399/implementing-shell-in-c-and-need-help-handling-input-output-redirection
                     if (in_flag)
                     {
-                        int fd0 = open(input, O_RDONLY);
-                        dup2(fd0, STDIN_FILENO);
-                        close(fd0);
+                        int fd0 = open(input, O_RDONLY); //opens file
+                        dup2(fd0, STDIN_FILENO); //copies descriptor to stdin
+                        close(fd0); ///closes file
                     }
 
                     else if (out_flag)
                     {
-                        int fd1 = creat(out_file , 0644) ;
+                        //0644 creates or opens file
+                        int fd1 = creat(out_file , 0644); 
                         dup2(fd1, STDOUT_FILENO);
                         close(fd1);
                     }
                     
-                     
+                    //normal exec
                     if (!f) {
                         execvp(command[0],command);
-                        perror("Falla en ejecucion excecvp()");
+                        perror(RED("Falla en ejecucion excecvp()"));
                         exit(0);
                     }
                     waitpid(f,&status,0);
@@ -168,27 +181,29 @@ int main() {
                 exit(1);
             }
 
-            if (fork() == 0)            //first fork
+            if (fork() == 0) //first fork
             {
-                close(STDOUT_FILENO);  //closing stdout
-                dup(des_p[1]);         //replacing stdout with pipe write 
-                close(des_p[0]);       //closing pipe read
+                //first pipe writes to second pipe
+                //closing stdout
+                dup2(des_p[1], STDOUT_FILENO); //replacing stdout with pipe write 
+                close(des_p[0]); //closing pipe read
                 close(des_p[1]);
 
                 execvp(command[0],command);
-                perror("Falla en ejecucion excecvp()");
+                perror(RED("Falla en ejecucion pipe 1 excecvp()"));
                 exit(0);
             }
 
-            if (fork() == 0)            //creating 2nd child
+            if (fork() == 0) //creating 2nd child
             {
-                close(STDIN_FILENO);   //closing stdin
-                dup(des_p[0]);         //replacing stdin with pipe read
-                close(des_p[1]);       //closing pipe write
+                //second pipe reads from first pipe
+                //closing stdin
+                dup2(des_p[0], STDIN_FILENO); //replacing stdin with pipe read
+                close(des_p[1]); //closing pipe write
                 close(des_p[0]);
 
                 execvp(p_command[0],p_command);
-                perror("Falla en ejecucion excecvp()");
+                perror(RED("Falla en ejecucion pipe 2 excecvp()"));
                 exit(0);
             }
 
@@ -199,6 +214,7 @@ int main() {
         }
 
 
+        //cleaning up
         dup2(saved_stdin, STDIN_FILENO);
         dup2(saved_stdout, STDOUT_FILENO);
         close(saved_stdin);
