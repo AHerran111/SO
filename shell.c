@@ -15,7 +15,7 @@ int main() {
     while(strcmp("exit",input)) {
         i = 0;
 
-        printf("ingresa comando\n");
+        printf("HERRAN_ROMERO@shell>>");
        
         fgets(input,sizeof(input),stdin);
         input[strcspn(input, "\n")] = '\0';//removes trailing "enter"
@@ -51,7 +51,7 @@ int main() {
                     close(STDERR_FILENO);
 
                     execvp(command[0],command);
-                    perror("falla en ejecucion excecvp()");
+                    perror("Falla en ejecucion excecvp()");
                     exit(0);
                 }
             }
@@ -59,7 +59,7 @@ int main() {
             else {
                 if (!f) {
                     execvp(command[0],command);
-                    perror("falla en ejecucion excecvp()");
+                    perror("Falla en ejecucion excecvp()");
                     exit(0);
                 }
                 waitpid(f,&status,0);
