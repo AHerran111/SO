@@ -5,17 +5,16 @@
 #include <string.h>
 
 int main() {
-    int i = 0,f;
-    int status;
+    int i = 0, f, status;
     char input[100];
     char *command[20];    
-    char* token;
+    char *token;
   
 
     while(strcmp("exit",input)) {
         i = 0;
 
-        printf("HERRAN_ROMERO@shell>>");
+        printf("HERRAN_ROMERO@shell>>$ ");
        
         fgets(input,sizeof(input),stdin);
         input[strcspn(input, "\n")] = '\0';//removes trailing "enter"
@@ -54,6 +53,7 @@ int main() {
                     perror("Falla en ejecucion excecvp()");
                     exit(0);
                 }
+                sleep(1);
             }
 
             else {
@@ -66,7 +66,6 @@ int main() {
             }
         }
         
-        sleep(1);
         memset(command, 0, sizeof(command));
         memset(input, 0, sizeof(input));
     }
