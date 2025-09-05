@@ -39,14 +39,15 @@ int main() {
 
     while(strcmp("exit",input)) {
 
-        saved_stdin = dup(STDIN_FILENO);
-        saved_stdout = dup(STDOUT_FILENO);
         i = 0, p_flag = 0, in_flag = 0, out_flag = 0;
 
         printf(GREEN("HERRAN_ROMERO@shell")">>$ ");
        
         fgets(input,sizeof(input),stdin);
         input[strcspn(input, "\n")] = '\0';//removes trailing "enter"
+
+        saved_stdin = dup(STDIN_FILENO);
+        saved_stdout = dup(STDOUT_FILENO);
 
         token = strtok(input, " ");
 
