@@ -4,6 +4,7 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <signal.h>
+#include <fcntl.h>   
 #include "format.h"
 
 void sigchild_handler (int sig) {
@@ -27,12 +28,20 @@ int main() {
     char *token;
     int p_flag = 0;
     int des_p[2];
-  
+    int in_flag = 0, out_flag = 0;
+    char *in_file = malloc(64); 
+    char *out_file = malloc(64); 
+    int saved_stdin;
+    int saved_stdout; 
+   
     system("clear"); 
     signal(SIGCHLD, sigchild_handler);
 
     while(strcmp("exit",input)) {
-        i = 0, p_flag = 0;
+
+        saved_stdin = dup(STDIN_FILENO);
+        saved_stdout = dup(STDOUT_FILENO);
+        i = 0, p_flag = 0, in_flag = 0, out_flag = 0;
 
         printf(GREEN("HERRAN_ROMERO@shell")">>$ ");
        
@@ -47,6 +56,22 @@ int main() {
               printf("pipe detected\n");
               p_flag = 1;
               break;
+            }
+
+            if (strcspn(token,"<") == 0) {
+
+                printf("sdtin redirect detected\n");
+                in_flag = 1;
+                command[i] = NULL;//execvp() recieves the last NULL in the array
+                break;
+            }
+
+            if (strcspn(token,">") == 0) {
+
+                printf("sdtout redirect detected\n");
+                out_flag = 1;
+                command[i] = NULL;//execvp() recieves the last NULL in the array
+                break;
             }
 
             command[i] = token;
@@ -70,6 +95,15 @@ int main() {
             }
             p_command[i] = NULL;//execvp() recieves the last NULL in the array
         }
+
+        if (in_flag || out_flag) {
+
+            token = strtok(NULL, " ");
+            
+            if (in_flag) in_file = token;
+            else out_file= token;
+
+        }
         
         if (!p_flag) {
 
@@ -78,6 +112,7 @@ int main() {
             if (f < 0)  perror("fork fallido");
             
             else {
+
                 if(strcspn(command[i-1],"&") == 0) {
 
                     if (f) printf("Proceso en background(PID: %d)\n", f);
@@ -95,14 +130,30 @@ int main() {
                     }
                     sleep(1);
                 }
-
+                
                 else {
+                    if (in_flag)
+                    {
+                        int fd0 = open(input, O_RDONLY);
+                        dup2(fd0, STDIN_FILENO);
+                        close(fd0);
+                    }
+
+                    else if (out_flag)
+                    {
+                        int fd1 = creat(out_file , 0644) ;
+                        dup2(fd1, STDOUT_FILENO);
+                        close(fd1);
+                    }
+                    
+                     
                     if (!f) {
                         execvp(command[0],command);
                         perror("Falla en ejecucion excecvp()");
                         exit(0);
                     }
                     waitpid(f,&status,0);
+                    
                 }
             }
         }
@@ -145,7 +196,14 @@ int main() {
             wait(0);
             wait(0);
         }
-        
+
+
+        dup2(saved_stdin, STDIN_FILENO);
+        dup2(saved_stdout, STDOUT_FILENO);
+        close(saved_stdin);
+        close(saved_stdout);
+        memset(out_file, 0, sizeof(out_file));
+        memset(in_file, 0, sizeof(in_file));
         memset(command, 0, sizeof(command));
         memset(p_command, 0, sizeof(command));
         memset(input, 0, sizeof(input));
