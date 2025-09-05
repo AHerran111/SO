@@ -19,11 +19,5 @@
 #define BG_CYAN(string) "\x1b[46m" string "\x1b[0m"
 #define BG_WHITE(string) "\x1b[1m" string "\x1b[0m"
 
-#define TEXT(string)\
-for(int x=90;x<108;x++)\
-{\
-printf("\n\x1b[%dm" string "\x1b[0m %d\n",x,x);\
-}\
-
 #endif
 
