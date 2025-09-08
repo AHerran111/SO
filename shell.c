@@ -226,4 +226,6 @@ int main() {
         memset(input, 0, sizeof(input));
     }
 
+    free(in_file);
+    free(out_file);
 }
