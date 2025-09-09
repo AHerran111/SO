@@ -15,7 +15,7 @@
 
 #define INICIAL 900000000
 #define FINAL 1000000000
-#define N_THREADS 4
+#define N_THREADS 10
 
 int mat[SIZE][SIZE];
 
