@@ -44,7 +44,6 @@ int main()
         pthread_join(tid[i],NULL);
     }
 
-	
     for (int i = 0; i<N_THREADS; i++ ) {
         f_sum = f_sum + sum[i];
     }
@@ -53,7 +52,7 @@ int main()
 	stop_ts = ts.tv_sec; // Tiempo final
 
 	elapsed_time = stop_ts - start_ts;
-	printf("Resultado = %.8lf\n",f_sum);
+	printf("Resultado = %.14lf\n",f_sum);
 	printf("------------------------------\n");
 	printf("TIEMPO TOTAL, %lld segundos\n",elapsed_time);
 }
@@ -65,15 +64,19 @@ void * t_func (void *args) {
     int numt = *(int *)args;
     int start = numt * (ITERS/N_THREADS) + 1;
     int end = (numt + 1) * (ITERS/N_THREADS);
+    double value;
 
     for(n=start;n<end;n++) {
-		sum[numt] = sum[numt] + pow(-1,n+1) * pow(x,n) / n;
+        value = (pow(-1,n+1) * pow(x,n) / n);
 
         //si el valor empieza hacer overflow(0), romper ciclo
-        if(sum[numt] == 0.0) break;
+        if(value)
+		    sum[numt] = sum[numt] + value;
+        else
+            break;   
     }
 
-    //En la mayoria de casos el primer elemento dara el valor, y el resto
+    //En la mayoria de casos el primer thread dara el valor, y el resto
     //0, ya que los valores retornados son tan altos
     //que no pueden ser almacenados en double
     //printf("final[%d] = %lf\n",numt,sum[numt]);
