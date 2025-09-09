@@ -7,9 +7,13 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
+                "-Wall",        // enable most warnings
+                "-Wextra",      // enable extra warnings
+                "-Wpedantic",   // (optional) strict ISO C compliance
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/${fileBasenameNoExtension}",
+                "-lm"           // must stay at the end
             ],
             "options": {
                 "cwd": "${fileDirname}"
