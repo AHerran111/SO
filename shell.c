@@ -48,6 +48,8 @@ int main() {
         fgets(input,sizeof(input),stdin);
         input[strcspn(input, "\n")] = '\0';//removes trailing "enter"
 
+        if (strcspn(input,"\0") == 0) continue;
+
         //stdin and stdout are restorded in case of redirect
         saved_stdin = dup(STDIN_FILENO);
         saved_stdout = dup(STDOUT_FILENO);
@@ -87,6 +89,7 @@ int main() {
             i += 1;
         }
         command[i] = NULL;//execvp() recieves the last NULL in the array
+
 
         //parsing 2nd command after pipe
         if (p_flag) {
