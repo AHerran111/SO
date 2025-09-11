@@ -7,6 +7,8 @@
 #include <fcntl.h>   
 #include "format.h"
 
+int f;
+
 void sigchild_handler (int sig) {
     int status, pid;
 
@@ -14,19 +16,27 @@ void sigchild_handler (int sig) {
     //waitpid runs constantly returning 0, when it catches a zombie it returns 1
     //on loop to guarantee it cathces all zombies, SIGCHILD signals may be not 1:1
     //by catching the signal the kernel cleans up, the child is already exited
-    while (pid = waitpid(-1,&status,WNOHANG) > 0) {
+    while (waitpid(-1,&status,WNOHANG) > 0) {
                                               
-        printf(BLUE("zombie aniquilado con pid:%d\n"), pid);
+        printf(BLUE("zombie aniquilado\n"));
     }
 }
 
+void child_sigint_handler (int sig) {
+    if(f) {
+        kill(f,SIGKILL);
+    }
+}
+
+
+
 int main() {
-    int i = 0, f, status;
+    int i = 0, status;
     char input[100]; //scanf input
     char *command[20];   //parsed command
     char *token; 
 
-    char *p_command[20];  //pipe vars
+    char *p_command[20];  //pipe vars;
     int p_flag = 0; 
     int des_p[2]; 
 
@@ -39,16 +49,19 @@ int main() {
     system("clear"); 
     signal(SIGCHLD, sigchild_handler);
 
-    while(strcmp("exit",input)) {
+    while(1) {
 
         i = 0, p_flag = 0, in_flag = 0, out_flag = 0;
 
-        printf(GREEN("HERRAN_ROMERO@shell")">>$ ");
+        signal(SIGINT, SIG_IGN);
+
+        printf(GREEN("HERRAN_SILVA@shell")">>$ ");
        
         fgets(input,sizeof(input),stdin);
         input[strcspn(input, "\n")] = '\0';//removes trailing "enter"
 
         if (strcspn(input,"\0") == 0) continue;
+        if (strcspn(input,"exit") == 0) return 0;
 
         //stdin and stdout are restorded in case of redirect
         saved_stdin = dup(STDIN_FILENO);
@@ -123,6 +136,8 @@ int main() {
             
             else {
 
+                signal(SIGINT, child_sigint_handler); //function kills child
+
                 //background process
                 if(strcspn(command[i-1],"&") == 0) {
 
@@ -150,7 +165,7 @@ int main() {
                     //https://stackoverflow.com/questions/11515399/implementing-shell-in-c-and-need-help-handling-input-output-redirection
                     if (in_flag)
                     {
-                        int fd0 = open(input, O_RDONLY); //opens file
+                        int fd0 = open(in_file, O_RDONLY); //opens file
                         dup2(fd0, STDIN_FILENO); //copies descriptor to stdin
                         close(fd0); ///closes file
                     }
