@@ -1,106 +1,94 @@
-/*
- * Para compilar hay que agregar la librería matemática
- *  	gcc -o matprimos matprimos.c -lm
- *		gcc -o matprimos matprimos.c -lm -lpthread
- */
+#define _POSIX_C_SOURCE 199309L
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
-#include <sys/time.h>
 #include <pthread.h>
+#include <time.h>
 
+#define THREADS 12
+int start;
+int end;
+int count[THREADS] = {0};
 
-#define SIZE 4000
-
-#define INICIAL 900000000
-#define FINAL 1000000000
-#define N_THREADS 10
-
-int mat[SIZE][SIZE];
-
-void initmat(int mat[][SIZE]);
-void printnonzeroes(int mat[SIZE][SIZE]);
 int isprime(int n);
+void * t_func (void *args);
+
+int main(int argc, char * argv[]) {
+   
+    pthread_t tid[THREADS];
+    int nthread[THREADS];
+    int sum = 0;
+    int i;
+    struct timespec begin, finish;
+    
 
 
+    // printf("La cantidad de args:%d\n", argc);
+    
+    // for(int i=0; i<argc; i++) {
+    //     printf("arg %d:%s\n", i, argv[i]);
+    // }
+
+    if (argc == 3) {
+        start = atoi(argv[1]);
+        end = atoi(argv[2]);
+
+        printf("start %d, end %d\n",start,end);
+
+        if (end < start) {
+            int temp = start;
+            start = end; end = temp;
+
+        }
+        
+        clock_gettime(CLOCK_MONOTONIC, &begin);
+
+        for(i=0; i<THREADS; i++){
+            nthread[i] = i;
+            pthread_create(&tid[i],NULL,t_func,&nthread[i]);
+        }
+
+        for(i=0; i<THREADS; i++){
+            pthread_join(tid[i],NULL);
+        }
+
+        for(i=0; i<THREADS; i++){
+            sum += count[i];
+        }
+
+        clock_gettime(CLOCK_MONOTONIC, &finish);
+
+        double elapsed = (finish.tv_sec - begin.tv_sec)
+                    + (finish.tv_nsec - begin.tv_nsec) / 1e9;
+
+        printf("Cuenta de primes entre %d y %d: %d\n",start,end,sum);
+        printf("------------------------------\n");
+	    printf("Elapsed time: %.6f seconds\n", elapsed);
+    }
+
+    else
+        printf("help");
+
+
+}
 
 void * t_func (void *args) {
+    int nthread = *(int*)args;
+    int range = (end - start);
 
-    int num = *((int*)args);
-    int i,j;
+    int first = start + (nthread * range/THREADS); 
+    int last = start + ((nthread + 1) * range/THREADS);
 
-    int start = num * (SIZE/N_THREADS);
-    int end = (num+1) * (SIZE/N_THREADS);
+    if(nthread ==THREADS - 1) last += 1;
 
-    for(i=start;i<end;i++)
-            for(j=0;j<SIZE;j++)
-                if(!isprime(mat[i][j]))
-                    mat[i][j]=0;
-}
-
-int main()
-{
-	long long start_ts;
-	long long stop_ts;
-	long long elapsed_time;
-	long lElapsedTime;
-	struct timeval ts;
-	int i,j;
-    int num[N_THREADS];
-    pthread_t tid[N_THREADS];
-
-	// Inicializa la matriz con números al azar
-	initmat(mat);
-	
-	gettimeofday(&ts, NULL);
-	start_ts = ts.tv_sec; // Tiempo inicial
-
-	// Eliminar de la matriz todos los números que no son primos
-	// Esta es la parte que hay que paralelizar
-	
-	 for(int i=0; i<N_THREADS; i++){
-        num[i] = i;
-        pthread_create(&tid[i],NULL,t_func,&num[i]);
+    for(int i = first; i<last; i++) {
+        if(isprime(i)) count[nthread] += 1;
     }
-
-    for(int i=0; i<N_THREADS; i++){
-        pthread_join(tid[i],NULL);
-    }
-	
-	// Hasta aquí termina lo que se tiene que hacer en paralelo
-	gettimeofday(&ts, NULL);
-	stop_ts = ts.tv_sec; // Tiempo final
-	elapsed_time = stop_ts - start_ts;
-
-
-	printnonzeroes(mat);
-	printf("------------------------------\n");
-	printf("TIEMPO TOTAL, %lld segundos\n",elapsed_time);
+    
 }
 
-void initmat(int mat[][SIZE])
-{
-	int i,j;
-	
-	srand(getpid());
-	
-	for(i=0;i<SIZE;i++)
-		for(j=0;j<SIZE;j++)
-			mat[i][j]=INICIAL+rand()%(FINAL-INICIAL);
-}
 
-void printnonzeroes(int mat[SIZE][SIZE])
-{
-	int i,j;
-	
-	for(i=0;i<SIZE;i++)
-		for(j=0;j<SIZE;j++)
-			if(mat[i][j]!=0)
-				printf("%d\n",mat[i][j]);
-}
-
-			   
 int isprime(int n)
 {
 	int d=3;
