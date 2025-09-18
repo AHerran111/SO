@@ -74,6 +74,25 @@ void parse_args(int argc, char *argv[]){
     
     int opt;
     int i = 0;
+    char helpstring[] = {"Usage: %s [options] <start> <end>\n"
+        "\n"
+        "Count prime numbers in a given range, optionally using multiple threads.\n"
+        "\n"
+        "Options:\n"
+        "  -N <num>       Set the number of threads to use (default: number of CPUs).\n"
+        "  -s             Sequential mode (disable multithreading).\n"
+        "  -t A..B        Testing mode: run with thread counts from A up to B-1.\n"
+        "  -h             Show this help message and exit.\n"
+        "\n"
+        "Arguments:\n"
+        "  <start>        Beginning of the integer range.\n"
+        "  <end>          End of the integer range.\n"
+        "\n"
+        "Examples:\n"
+        "  %s -N 4 1 1000000    # Count primes between 1 and 1,000,000 using 4 threads\n"
+        "  %s -s 1 1000000      # Count primes sequentially\n"
+        "  %s -t 1..8 1 1000000 # Run tests with 1 to 7 threads\n"
+        "\n",};
     
     //FUNC PARSES ARGS FROM argv[] ON A WHILE LOOP
     //WITH PREDEFINED OPTIONS "N:hst:"
@@ -89,7 +108,7 @@ void parse_args(int argc, char *argv[]){
                 break;
 
             case 'h':
-                printf("help usage:banderas primero, nums al final\n");
+                printf(helpstring);
                 exit(0);
 
             case 's':
@@ -104,15 +123,15 @@ void parse_args(int argc, char *argv[]){
                 break;
 
             case '?':
-                printf("help usage:banderas primero, nums al final\n");
+                printf(helpstring);
                 exit(0);
+
         } 
     } 
 
     //EDGE CASES/ARG ORDER DIFFERENT AS EXPECTED
     if(!i && argc > 3) {
-        printf("unknown input entered\n");
-        printf("help usage:banderas primero, despues nums\n");
+        printf(helpstring);
         exit(0);
     }
 

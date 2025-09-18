@@ -1,7 +1,2 @@
-#include <stdio.h>
-#include <unistd.h>
-
-int main()
-{
-	printf("\nHola mundo\n");
-}
+model name	: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz
+model name	: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz

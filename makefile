@@ -1,8 +1,11 @@
 # Compiler
 CC = gcc
 
-# Compiler flags (optional: -Wall shows warnings, -g adds debug info)
+# Compiler flags
 CFLAGS = -Wall -Wextra -g
+
+# Linker flags
+LDLIBS = -lm
 
 # Target executable name
 TARGET = a.out
@@ -11,8 +14,8 @@ TARGET = a.out
 all: $(TARGET)
 
 # Rule to build the target
-$(TARGET): shell.c
-	$(CC) $(CFLAGS) -o $(TARGET) shell.c
+$(TARGET): primes.c
+	$(CC) $(CFLAGS) -o $(TARGET) primes.c $(LDLIBS)
 
 # Clean up compiled files
 clean:
