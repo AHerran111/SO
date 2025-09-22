@@ -76,6 +76,14 @@ Performace:
 1-100,000,000
 1 THREAD: 50.871951 seconds
 2 THREAD: 34.665152 seconds
-4 THREAD: 0.720458 seconds
-11 THREADS: 0.402036 seconds
+4 THREAD: 19.791021 seconds
+11 THREADS: 11.328129 seconds
+
+1-1,000,000,000
+1 THREAD: 1351.85 seconds
+11 THREAD: 77.670233 seconds
+
+Analisis:
+Podemos ver que la ventaja de los threads se demuestra hasta los 100,000 nums, antes de esto la vetnaja es minima, o en mayor cantidad de threads, resulta aun mas tardado los calculos, pero al igual, podemos ver como en magnitudes mas grandes, las ventajas son claramente visibles, tal como se ve en el ultimo test, en el que se como se ejecuta el codigo mas de 10 veces mas rapido.
+
 

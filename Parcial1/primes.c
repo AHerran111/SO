@@ -163,6 +163,8 @@ void * t_func (void *args) {
 
     for(int i = first; i<last; i++) {
         if(isprime(i)) count[nthread] += 1;
+        // if(!(i%(range/100))) 
+        //     printf("%d%%\n",i/(range/100));
     }
     
     return NULL;
