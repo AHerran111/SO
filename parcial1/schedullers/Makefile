@@ -36,4 +36,4 @@ $L/libthreads.o: $S/libthreads.c $I/libthreads.h $I/commondata.h
 clean:
 	rm $B/exampleRR $B/exampleRR2 $B/exampleFCFS $B/exampleRetro
 	rm $L/*.o
-	rm $B/results.txt
+# 	rm $B/results.txt

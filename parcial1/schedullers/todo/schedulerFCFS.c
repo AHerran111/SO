@@ -8,6 +8,7 @@ extern int unblockevent;
 QUEUE ready;
 QUEUE waitinginevent[MAXTHREAD];
 
+
 void scheduler(int arguments)
 {
 	int old,next;
@@ -41,9 +42,10 @@ void scheduler(int arguments)
 	
 	if(event==UNBLOCKTHREAD)
 	{
-			threads[callingthread].status=READY;
-			_enqueue(&ready,callingthread);
+		threads[callingthread].status=READY;
+		_enqueue(&ready,callingthread);
 	}
+
 
 	
 	if(changethread)

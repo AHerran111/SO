@@ -7,6 +7,7 @@ extern int unblockevent;
 
 QUEUE ready;
 QUEUE waitinginevent[MAXTHREAD];
+int count = 1;
 
 void scheduler(int arguments)
 {
@@ -45,6 +46,17 @@ void scheduler(int arguments)
 			_enqueue(&ready,callingthread);
 	}
 
+	if(event==TIMER)
+	{	
+		count --;
+
+		if (!count) {
+			threads[callingthread].status=READY;
+			_enqueue(&ready,callingthread);
+			changethread = 1;
+			count = 1;
+		}
+	}
 	
 	if(changethread)
 	{
