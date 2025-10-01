@@ -60,7 +60,7 @@ int main() {
         fgets(input,sizeof(input),stdin);
         input[strcspn(input, "\n")] = '\0';//removes trailing "enter"
 
-        if (strcspn(input,"\0") == 0) continue;
+        if (strcspn(input,"\0") == 0) continue;//if empty returns shell
         if (strcspn(input,"exit") == 0) return 0;
 
         //stdin and stdout are restorded in case of redirect

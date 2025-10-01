@@ -1,13 +1,19 @@
 #include <scheduler.h>
+#include <linkedlist.h>
 
 extern THANDLER threads[MAXTHREAD];
 extern int currthread;
 extern int blockevent;
 extern int unblockevent;
 
-QUEUE ready;
+QUEUE ready[MAXTHREAD];
 QUEUE waitinginevent[MAXTHREAD];
 int count = 1;
+
+LinkedList *queues;
+int flag = 0;
+int size = 0;
+int pos = 0;
 
 void scheduler(int arguments)
 {
@@ -17,6 +23,13 @@ void scheduler(int arguments)
 	
 	int event=arguments & 0xFF00;
 	int callingthread=arguments & 0xFF;
+	
+
+	if (!flag) {
+		size = _initList();
+		printf("list created with %d queues\n");
+		flag = 1;
+	}
 
 	if(event==NEWTHREAD)
 	{
@@ -30,7 +43,7 @@ void scheduler(int arguments)
 
 		threads[callingthread].status=BLOCKED;
 		_enqueue(&waitinginevent[blockevent],callingthread);
-
+		printf("%d is blocking\n",callingthread);
 		changethread=1;
 	}
 
@@ -48,14 +61,14 @@ void scheduler(int arguments)
 
 	if(event==TIMER)
 	{	
-		count --;
+		printf("%d\n",_queue_size(&ready[pos]));
+			
 
-		if (!count) {
-			threads[callingthread].status=READY;
-			_enqueue(&ready,callingthread);
-			changethread = 1;
-			count = 1;
-		}
+		threads[callingthread].status=READY;
+		_enqueue(&ready,callingthread);
+		changethread = 1;
+
+		
 	}
 	
 	if(changethread)
@@ -67,4 +80,16 @@ void scheduler(int arguments)
 		_swapthreads(old,next);
 	}
 
+}
+
+
+int  _initList() {
+
+	queues = list_create();
+
+	for(int i=0; i<MAXTHREAD; i++) {
+		list_push_back(queues,&ready[i]);
+	}
+
+	return list_size(queues);
 }

@@ -5,6 +5,7 @@ extern int currthread;
 extern int blockevent;
 extern int unblockevent;
 
+QUEUE queues[0xFF];
 QUEUE ready;
 QUEUE waitinginevent[MAXTHREAD];
 

@@ -47,8 +47,13 @@ int main()
 	for(i=0;i<100000000;i++);
 
 	n=1;
+	printf("Se crea hilo 1\n");
 	t1=CreateThread(loop1, (void *) &n);
-	for(i=0;i<20000000;i++);
+
+	for(i=0;i<400;i++)
+		Sleep(1);
+
+	printf("Se crea hilo 2\n");
 	t2=CreateThread(loop2, NULL); 
 	m=3;
 
@@ -58,8 +63,12 @@ int main()
 		printf("Ejecución en main i=%d, hilo=%d\n",i,GetTid());
 		for(j=0;j<200000000;j++);
     } */
-	for(i=0;i<30000000;i++);
+	for(i=0;i<400;i++)
+		Sleep(1);
+
+	printf("Se crea hilo 3\n");
 	t3=CreateThread(loop1, (void *) &m);	
+
 	stat=WaitThread(t2);
 	printf("Termina hilo %d con status = %d\n",t2,stat);
 	stat=WaitThread(t1);

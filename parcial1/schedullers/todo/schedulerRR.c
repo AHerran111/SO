@@ -5,6 +5,7 @@ extern int currthread;
 extern int blockevent;
 extern int unblockevent;
 
+
 QUEUE ready;
 QUEUE waitinginevent[MAXTHREAD];
 int count = 1;

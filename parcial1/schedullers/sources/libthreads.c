@@ -65,6 +65,10 @@ void _initqueue(QUEUE *q)
 	q->head=0;
 	q->tail=0;
 }
+
+int _queue_size(QUEUE *q) {
+	return q->head;
+}
 	
 
 void _enqueue(QUEUE *q,int val)

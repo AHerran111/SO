@@ -4,19 +4,21 @@ I=include
 S=sources
 T=todo
 
-all: $B/exampleRR $B/exampleRR2 $B/exampleRetro $B/exampleFCFS $L/schedulerRR.o $L/schedulerRR2.o $L/schedulerRetro.o $L/schedulerFCFS.o $L/libthreads.o
+all: $B/exampleRR $B/exampleRR2 $B/exampleRetro $B/exampleFCFS \
+     $L/schedulerRR.o $L/schedulerRR2.o $L/schedulerRetro.o $L/schedulerFCFS.o \
+     $L/libthreads.o $L/liblinkedlist.o
 
-$B/exampleRR: $S/example.c $L/libthreads.o $L/schedulerRR.o
-	gcc -o $B/exampleRR $S/example.c $L/libthreads.o $L/schedulerRR.o -I$I
+$B/exampleRR: $S/example.c $L/libthreads.o $L/schedulerRR.o $L/liblinkedlist.o
+	gcc -o $B/exampleRR $S/example.c $L/libthreads.o $L/schedulerRR.o $L/liblinkedlist.o -I$I
 
-$B/exampleRR2: $S/example.c $L/libthreads.o $L/schedulerRR2.o
-	gcc -o $B/exampleRR2 $S/example.c $L/libthreads.o $L/schedulerRR2.o -I$I
+$B/exampleRR2: $S/example.c $L/libthreads.o $L/schedulerRR2.o $L/liblinkedlist.o
+	gcc -o $B/exampleRR2 $S/example.c $L/libthreads.o $L/schedulerRR2.o $L/liblinkedlist.o -I$I
 	
-$B/exampleRetro: $S/example.c $L/libthreads.o $L/schedulerRetro.o
-	gcc -o $B/exampleRetro $S/example.c $L/libthreads.o $L/schedulerRetro.o -I$I
+$B/exampleRetro: $S/example.c $L/libthreads.o $L/schedulerRetro.o $L/liblinkedlist.o
+	gcc -o $B/exampleRetro $S/example.c $L/libthreads.o $L/schedulerRetro.o $L/liblinkedlist.o -I$I
 
-$B/exampleFCFS: $S/example.c $L/libthreads.o $L/schedulerFCFS.o
-	gcc -o $B/exampleFCFS $S/example.c $L/libthreads.o $L/schedulerFCFS.o -I$I
+$B/exampleFCFS: $S/example.c $L/libthreads.o $L/schedulerFCFS.o $L/liblinkedlist.o
+	gcc -o $B/exampleFCFS $S/example.c $L/libthreads.o $L/schedulerFCFS.o $L/liblinkedlist.o -I$I
 	
 $L/schedulerRR.o: $T/schedulerRR.c $I/libthreads.h $I/commondata.h
 	gcc -o $L/schedulerRR.o -c $T/schedulerRR.c -I$I
@@ -33,7 +35,10 @@ $L/schedulerFCFS.o: $T/schedulerFCFS.c $I/libthreads.h $I/commondata.h
 $L/libthreads.o: $S/libthreads.c $I/libthreads.h $I/commondata.h
 	gcc -o $L/libthreads.o -c $S/libthreads.c -I$I
 
+$L/liblinkedlist.o: $S/linkedlist.c $I/linkedlist.h
+	gcc -o $L/liblinkedlist.o -c $S/linkedlist.c -I$I
+
 clean:
-	rm $B/exampleRR $B/exampleRR2 $B/exampleFCFS $B/exampleRetro
-	rm $L/*.o
-# 	rm $B/results.txt
+	rm -f $B/exampleRR $B/exampleRR2 $B/exampleFCFS $B/exampleRetro
+	rm -f $L/*.o
+# 	rm -f $B/results.txt
