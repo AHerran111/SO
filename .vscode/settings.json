@@ -1,3 +1,10 @@
 {
-    "makefile.configureOnOpen": false
+    "makefile.configureOnOpen": false,
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+    "files.associations": {
+        "wait.h": "c",
+        "stat.h": "c",
+        "shm.h": "c",
+        "semaphore.h": "c"
+    }
 }

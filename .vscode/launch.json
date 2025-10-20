@@ -21,6 +21,10 @@
                     "description": "Set Disassembly Flavor to Intel",
                     "text": "-gdb-set disassembly-flavor intel",
                     "ignoreFailures": true
+                },
+                { 
+                    "text": "set detach-on-fork", 
+                    "description": "Keep both parent and child under debugger"
                 }
             ],
             "preLaunchTask": "C/C++: gcc build active file",
