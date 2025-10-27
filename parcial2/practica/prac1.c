@@ -56,6 +56,8 @@ void proc(int proc_num)
     for(i=proc_num; i<SERIES_MEMBER_COUNT;i+=NPROCS)
         shared->sums[proc_num] += get_member(i+1, shared->x_val);
 
+    printf("%f\n",shared->sums[proc_num]);
+
     // Incrementa la variable proc_count que es la cantidad de procesos que terminaron su cálculo
     //shared->proc_count++;
     sem_post(s_end);
@@ -86,6 +88,7 @@ void master_proc()
         sem_wait(s_end);
         printf("proc %d ended\n", i);
     }
+
 
     // Una vez que todos terminan, suma el total de cada uno
     shared->res = 0;

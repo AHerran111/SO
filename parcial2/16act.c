@@ -71,7 +71,14 @@ MESSAGE signalsem(MAILBOX *mb) {
     }
 
     else {
-    
+        
+        if(mb->messages[out].dest != getpid()) {
+            sem_post(mb->s_mutex);
+            msg = MSG_ERROR;
+            strcpy(msg.content,"DEST. MISMATCH");
+            return msg;
+        }
+
         msg = (mb->messages[out]);
         mb->out = ((mb->out + 1) % MB_SIZE);
         mb->messages[out].content[0] = '\0';
@@ -128,18 +135,20 @@ MAILBOX * initsem() {
     return mailbox;
 }
 
-destroysem(MAILBOX * mb) {
-
-    if (shmctl(mb->shmid, IPC_RMID, NULL) == -1) {
-        perror("shmctl IPC_RMID failed");
-        // Handle error
-    }
+void destroysem(MAILBOX * mb) {
 
     sem_close(mb->s_mutex);
     sem_close(mb->s_block);
 
     sem_unlink("/s_mutex");
     sem_unlink("/s_block");
+
+    if (shmctl(mb->shmid, IPC_RMID, NULL) == -1) {
+        perror("shmctl IPC_RMID failed");
+        // Handle error
+    }
+
+ 
 }
 
 //MAILBOX mb_;
@@ -156,7 +165,7 @@ int main(){
 
     if(!p) {
         msg.source = getpid();
-        msg.dest = 0;
+        msg.dest = getppid();
 
         for(int i=0; i<MB_SIZE*2;i++) {
             sprintf(str,"TEST%d",i);

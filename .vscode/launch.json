@@ -23,7 +23,7 @@
                     "ignoreFailures": true
                 },
                 { 
-                    "text": "set detach-on-fork", 
+                    "text": "set detach-on-fork off", 
                     "description": "Keep both parent and child under debugger"
                 }
             ],
